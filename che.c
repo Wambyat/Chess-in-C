@@ -4,7 +4,7 @@
 //This array represents the chess board.
 //Each element represents one chess piece or an empty space.
 //0=>empty space
-//if a number starts with one then it is black if it starts with 2 then white
+//if a number is negitive then it is white positive is black
 //second digit meanings:
 //1=>Pawn
 //2=>Rook
@@ -16,14 +16,14 @@
 //Declared as global variable to allow easy access for all function especially for move checking(Coming Soon!)
 int board[8][8]=
     {
-        {12,13,14,15,16,14,13,12},
-        {0,11,11,11,11,11,11,11},
+        {2,3,4,5,6,4,3,2},
+        {1,1,1,1,1,1,1,1},
         {0,0,0,0,0,0,0,0},
-        {0,0,0,0,12,0,0,0},
+        {0,0,0,-4,0,0,0,0},
+        {0,0,4,0,0,0,0,0},
         {0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0},
-        {21,21,21,21,21,21,21,21},
-        {22,23,24,25,26,24,23,22}
+        {-1,-1,-1,-1,-1,-1,-1,-1},
+        {-2,-3,-4,-5,-6,-4,-3,-2}
     };
 
 //This array is used to store all moves the pieces can move to
@@ -31,6 +31,9 @@ int moves[50];
 
 //This array stores all the indexes of moves that the user can move to that also captures a piece.
 int capture_indexes[50];
+
+//This variable is used to clean moves and capture_index
+int cleaner_var;
 
 //Capture trigger variable
 int captured;
@@ -59,7 +62,7 @@ void main()
         for (del=0;del<50;del++)
         {
                 moves[del]=0;
-                capture_indexes[del]=0;
+                capture_indexes[del]=-1;
         }
         //This is just some code that saves the first value because c is wierd. 
         int bo2=board[0][0];
@@ -110,6 +113,11 @@ void main()
                         board[mov1][mov2]=te;
                         bo2=board[0][0];
                         captured=0;
+                        for(cleaner_var=0;cleaner_var<50;cleaner_var++)
+                        {
+                                moves[cleaner_var]=0;
+                                capture_indexes[cleaner_var]=-1;
+                        }
                         continue;
                 }
 
@@ -130,6 +138,11 @@ void main()
                         board[mov1][mov2]=te;
                         bo2=board[0][0];
                         captured=0;
+                        for(cleaner_var=0;cleaner_var<50;cleaner_var++)
+                        {
+                                moves[cleaner_var]=0;
+                                capture_indexes[cleaner_var]=-1;
+                        }
                 }
         }
         
@@ -192,40 +205,40 @@ void disp()
                         //This is for displaying the pieces.
                         switch(board[i][j])
                         {
-                                case 11: 
+                                case 1: 
                                         printf("BPAWN   ");
                                         break;
-                                case 21: 
+                                case -1: 
                                         printf("WPAWN   ");
                                         break;
-                                case 12:
+                                case 2:
                                         printf("BROOK   ");
                                         break;
-                                case 22:
+                                case -2:
                                         printf("WROOK   ");
                                         break;
-                                case 13:
+                                case 3:
                                         printf("BKNIGHT ");
                                         break;
-                                case 23:
+                                case -3:
                                         printf("WKNIGHT ");
                                         break;
-                                case 14:
+                                case 4:
                                         printf("BBISHOP ");
                                         break;
-                                case 24:
+                                case -4:
                                         printf("WBISHOP ");
                                         break;
-                                case 15:
+                                case 5:
                                         printf("BQUEEN  ");
                                         break;
-                                case 25:
+                                case -5:
                                         printf("WQUEEN  ");
                                         break;
-                                case 16:
+                                case 6:
                                         printf("BKING   ");
                                         break;
-                                case 26:
+                                case -6:
                                         printf("WKING   ");
                                         break;
                                 default: 
@@ -331,7 +344,7 @@ void move_finder()
         printf("%d %d \n",choice1,choice2);
         switch(board[choice1][choice2])
         {
-                case 11:
+                case 1:
                         if(turn!=1)
                         {
                                 printf("Please choose a white piece because it is white's turn.\n");
@@ -354,7 +367,7 @@ void move_finder()
                         }
                         if(choice2!=7)
                         {
-                                if(board[choice1+1][choice2+1]>20)
+                                if(board[choice1+1][choice2+1]<0)
                                 {
                                         moves[mo]=((choice1+1)*10)+choice2+1;
                                         capture_indexes[c]=mo;
@@ -365,7 +378,7 @@ void move_finder()
                         }
                         if (choice2!=0)
                         {
-                                if(board[choice1+1][choice2-1]>20)
+                                if(board[choice1+1][choice2-1]<0)
                                 {
                                         moves[mo]=((choice1+1)*10)+choice2-1;
                                         capture_indexes[c]=mo;
@@ -376,7 +389,7 @@ void move_finder()
                         }
                         mo=0;
                         break;
-                case 21: 
+                case -1: 
                         if(turn!=2)
                         {
                                 printf("Please choose a black piece because it is black's turn.\n");
@@ -400,7 +413,7 @@ void move_finder()
                         }
                         if(choice2!=7)
                         {
-                                if(board[choice1-1][choice2+1]<20 && board[choice1-1][choice2+1]!=0)
+                                if(board[choice1-1][choice2+1]>0)
                                 {
                                         moves[mo]=((choice1-1)*10)+choice2+1;
                                         capture_indexes[c]=mo;
@@ -411,7 +424,7 @@ void move_finder()
                         }
                         if (choice2!=0)
                         {
-                                if(board[choice1-1][choice2-1]<20 && board[choice1-1][choice2-1]!=0)
+                                if(board[choice1-1][choice2-1]>0)
                                 {
                                         moves[mo]=((choice1-1)*10)+choice2-1;
                                         capture_indexes[c]=mo;
@@ -422,7 +435,7 @@ void move_finder()
                         }
                         mo=0;
                         break;
-                case 12:
+                case 2:
                         if(turn!=1)
                         {
                                 printf("Please choose a white piece because it is white's turn.\n");
@@ -440,7 +453,7 @@ void move_finder()
                                                moves[mo]=(re*10)+choice2;
                                                mo++;
                                        }
-                                       if(board[re][choice2]>20)
+                                       if(board[re][choice2]<0)
                                        {
                                                printf("WD ");
                                                moves[mo]=(re*10)+choice2;
@@ -449,7 +462,7 @@ void move_finder()
                                                mo++;
                                                break;
                                        }
-                                       if(board[re][choice2]<20 && board[re][choice2]!=0)
+                                       if(board[re][choice2]>0)
                                        {
                                                printf("BD ");
                                                break;
@@ -463,7 +476,7 @@ void move_finder()
                                                moves[mo]=(re*10)+choice2;
                                                mo++;
                                        }
-                                       if(board[re][choice2]>20)
+                                       if(board[re][choice2]<0)
                                        {
                                                printf("WU ");
                                                moves[mo]=(re*10)+choice2;
@@ -472,7 +485,7 @@ void move_finder()
                                                mo++;
                                                break;
                                        }
-                                       if(board[re][choice2]<20 && board[re][choice2]!=0)
+                                       if(board[re][choice2]>0)
                                        {
                                                printf("BU ");
                                                break;
@@ -487,7 +500,7 @@ void move_finder()
                                                moves[mo]=(choice1*10)+re;
                                                mo++;
                                        }
-                                       if(board[choice1][re]>20)
+                                       if(board[choice1][re]<0)
                                        {
                                                printf("WR ");
                                                moves[mo]=(choice1*10)+re;
@@ -496,7 +509,7 @@ void move_finder()
                                                mo++;
                                                break;
                                        }
-                                       if(board[choice1][re]<20 && board[choice1][re]!=0)
+                                       if(board[choice1][re]>0)
                                        {
                                                printf("BR ");
                                                break;
@@ -510,7 +523,7 @@ void move_finder()
                                                moves[mo]=(choice1*10)+re;
                                                mo++;
                                        }
-                                       if(board[choice1][re]>20)
+                                       if(board[choice1][re]<0)
                                        {
                                                printf("WL ");
                                                moves[mo]=(choice1*10)+re;
@@ -519,7 +532,7 @@ void move_finder()
                                                mo++;
                                                break;
                                        }
-                                       if(board[choice1][re]<20 && board[choice1][re]!=0)
+                                       if(board[choice1][re]>0)
                                        {
                                                printf("BL ");
                                                break;
@@ -528,7 +541,7 @@ void move_finder()
                         }
                         mo=0;
                         break;
-                case 22:
+                case -2:
                         if(turn!=2)
                         {
                                 printf("Please choose a black piece because it is black's turn.\n");
@@ -546,7 +559,7 @@ void move_finder()
                                                moves[mo]=(re*10)+choice2;
                                                mo++;
                                        }
-                                       if(board[re][choice2]<20 && board[re][choice2]!=0)
+                                       if(board[re][choice2]>0)
                                        {
                                                printf("BD ");
                                                moves[mo]=(re*10)+choice2;
@@ -555,7 +568,7 @@ void move_finder()
                                                mo++;
                                                break;
                                        }
-                                       if(board[re][choice2]>20)
+                                       if(board[re][choice2]<0)
                                        {
                                                printf("WD ");
                                                break;
@@ -569,7 +582,7 @@ void move_finder()
                                                moves[mo]=(re*10)+choice2;
                                                mo++;
                                        }
-                                       if(board[re][choice2]<20 && board[re][choice2]!=0)
+                                       if(board[re][choice2]>0)
                                        {
                                                printf("BU ");
                                                moves[mo]=(re*10)+choice2;
@@ -578,7 +591,7 @@ void move_finder()
                                                mo++;
                                                break;
                                        }
-                                       if(board[re][choice2]>20)
+                                       if(board[re][choice2]<0)
                                        {
                                                printf("WU ");
                                                break;
@@ -593,7 +606,7 @@ void move_finder()
                                                moves[mo]=(choice1*10)+re;
                                                mo++;
                                        }
-                                       if(board[choice1][re]<20 && board[choice1][re]!=0)
+                                       if(board[choice1][re]>0)
                                        {
                                                printf("BR ");
                                                moves[mo]=(choice1*10)+re;
@@ -602,7 +615,7 @@ void move_finder()
                                                mo++;
                                                break;
                                        }
-                                       if(board[choice1][re]>20)
+                                       if(board[choice1][re]<0)
                                        {
                                                printf("WR ");
                                                break;
@@ -616,7 +629,7 @@ void move_finder()
                                                moves[mo]=(choice1*10)+re;
                                                mo++;
                                        }
-                                       if(board[choice1][re]<20 && board[choice1][re]!=0)
+                                       if(board[choice1][re]>0)
                                        {
                                                printf("BL ");
                                                moves[mo]=(choice1*10)+re;
@@ -625,7 +638,7 @@ void move_finder()
                                                mo++;
                                                break;
                                        }
-                                       if(board[choice1][re]>20)
+                                       if(board[choice1][re]<0)
                                        {
                                                printf("WL ");
                                                break;
@@ -634,7 +647,133 @@ void move_finder()
                         }
                         mo=0;
                         break;
-                case 13:
+                case 3:
+                        if(turn!=1)
+                        {
+                                printf("Please choose a white piece because it is white's turn.\n");
+                                move_finder();
+                                break;
+                        }
+                        else
+                        {
+                                int a[8];
+                                int b[8];
+                                a[0]=choice1-1;
+                                b[0]=choice2-2;
+                                a[1]=choice1+1;
+                                b[1]=choice2+2;
+                                a[2]=choice1+1;
+                                b[2]=choice2-2;
+                                a[3]=choice1-1;
+                                b[3]=choice2+2;
+                                a[4]=choice1-2;
+                                b[4]=choice2-1;
+                                a[5]=choice1+2;
+                                b[5]=choice2+1;
+                                a[6]=choice1+2;
+                                b[6]=choice2-1;
+                                a[7]=choice1-2;
+                                b[7]=choice2+1;
+                                int cho;
+                                for(cho=0;cho<8;cho++)
+                                {
+                                        if(a[cho]<0 || a[cho]>7 || b[cho]<0 || b[cho]>7)
+                                        {
+                                                continue;
+                                        }
+                                        if (board[a[cho]][b[cho]]==0)
+                                        {
+                                                moves[mo]=(a[cho]*10)+b[cho];
+                                                mo++;
+                                        }
+                                        if (board[a[cho]][b[cho]]<0)
+                                        {
+                                                moves[mo]=(a[cho]*10)+b[cho];
+                                                capture_indexes[c]=mo;
+                                                c++;
+                                                mo++;
+                                        }
+                                }
+                        }
+                        mo=0;
+                        break;
+                case -3:
+                        if(turn!=2)
+                        {
+                                printf("Please choose a black piece because it is black's turn.\n");
+                                move_finder();
+                                break;
+                        }
+                        else
+                        {
+                                int a[8];
+                                int b[8];
+                                a[0]=choice1-1;
+                                b[0]=choice2-2;
+                                a[1]=choice1+1;
+                                b[1]=choice2+2;
+                                a[2]=choice1+1;
+                                b[2]=choice2-2;
+                                a[3]=choice1-1;
+                                b[3]=choice2+2;
+                                a[4]=choice1-2;
+                                b[4]=choice2-1;
+                                a[5]=choice1+2;
+                                b[5]=choice2+1;
+                                a[6]=choice1+2;
+                                b[6]=choice2-1;
+                                a[7]=choice1-2;
+                                b[7]=choice2+1;
+                                int cho;
+                                for(cho=0;cho<8;cho++)
+                                {
+                                        if(a[cho]<0 || a[cho]>7 || b[cho]<0 || b[cho]>7)
+                                        {
+                                                continue;
+                                        }
+                                        if (board[a[cho]][b[cho]]==0)
+                                        {
+                                                moves[mo]=(a[cho]*10)+b[cho];
+                                                mo++;
+                                        }
+                                        if (board[a[cho]][b[cho]]>0)
+                                        {
+                                                moves[mo]=(a[cho]*10)+b[cho];
+                                                capture_indexes[c]=mo;
+                                                c++;
+                                                mo++;
+                                        }
+                                }
+                        }
+                        mo=0;
+                        break;
+                case 4:
+                        if(turn!=1)
+                        {
+                                printf("Please choose a white piece because it is white's turn.\n");
+                                move_finder();
+                                break;
+                        }
+                        else
+                        {
+                                
+                        }
+                        mo=0;
+                        break;
+                case -4:
+                        if(turn!=2)
+                        {
+                                printf("Please choose a black piece because it is black's turn.\n");
+                                move_finder();
+                                break;
+                        }
+                        else
+                        {
+                                
+                        }
+                        mo=0;
+                        break;
+                case 5:
                         if(turn!=1)
                         {
                                 printf("Please choose a white piece because it is white's turn.\n");
@@ -642,7 +781,7 @@ void move_finder()
                                 break;
                         }
                         break;
-                case 23:
+                case -5:
                         if(turn!=2)
                         {
                                 printf("Please choose a black piece because it is black's turn.\n");
@@ -650,7 +789,7 @@ void move_finder()
                                 break;
                         }
                         break;
-                case 14:
+                case 6:
                         if(turn!=1)
                         {
                                 printf("Please choose a white piece because it is white's turn.\n");
@@ -658,39 +797,7 @@ void move_finder()
                                 break;
                         }
                         break;
-                case 24:
-                        if(turn!=2)
-                        {
-                                printf("Please choose a black piece because it is black's turn.\n");
-                                move_finder();
-                                break;
-                        }
-                        break;
-                case 15:
-                        if(turn!=1)
-                        {
-                                printf("Please choose a white piece because it is white's turn.\n");
-                                move_finder();
-                                break;
-                        }
-                        break;
-                case 25:
-                        if(turn!=2)
-                        {
-                                printf("Please choose a black piece because it is black's turn.\n");
-                                move_finder();
-                                break;
-                        }
-                        break;
-                case 16:
-                        if(turn!=1)
-                        {
-                                printf("Please choose a white piece because it is white's turn.\n");
-                                move_finder();
-                                break;
-                        }
-                        break;
-                case 26:
+                case -6:
                         if(turn!=2)
                         {
                                 printf("Please choose a black piece because it is black's turn.\n");
@@ -715,10 +822,11 @@ int move_checker()
                 if (moves[ij]==0)
                 {
                         checker=(mov1*10)+mov2;
-                        printf("%d ",checker);
+                        printf("To move-> %d\n ",checker);
                         if(ij==0)
                         {
                                 printf("No Moves available.\n");
+                                return 1;
                         }
                         while(ij!=0)
                         {
@@ -735,6 +843,7 @@ int move_checker()
                                         {
                                                 if(moves[capture_indexes[asd]]==checker)
                                                 {
+                                                        printf("\n%d\n",moves[capture_indexes[asd]]);
                                                         ij=0;
                                                         printf("Capturing something!\n");
                                                         captured=1;
@@ -744,11 +853,10 @@ int move_checker()
                                 if(ij!=0)
                                 {
                                         printf("Not a valid spot, choose again\n");
-                                        int cleaner_var;
                                         for(cleaner_var=0;cleaner_var<50;cleaner_var++)
                                         {
                                                 moves[cleaner_var]=0;
-                                                capture_indexes[cleaner_var]=0;
+                                                capture_indexes[cleaner_var]=-1;
                                         }
                                         return 1;
                                 }
