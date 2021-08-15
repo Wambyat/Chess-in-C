@@ -14,6 +14,7 @@
 //6=>King
 
 //Declared as global variable to allow easy access for all function especially for move checking(Coming Soon!)
+
 int board[8][8]=
     {
         {2,3,4,5,6,4,3,2},
@@ -25,7 +26,20 @@ int board[8][8]=
         {-1,-1,-1,-1,-1,-1,-1,-1},
         {-2,-3,-4,-5,-6,-4,-3,-2}
     };
-
+/*
+int board[8][8]=
+    {
+        {0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,-1,0},
+        {0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0},
+        {0,0,4,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0}
+    };
+*/
+int mo;
 //This array is used to store all moves the pieces can move to
 int moves[50];
 
@@ -55,7 +69,72 @@ int move_checker();
 
 //These variables accept the values.
 char c[2],d[2];
-
+//to delete later
+void movedisp(int a)
+{
+        int b=a/10;
+        int c=a%10;
+        switch(c)
+        {
+                case 0:
+                printf("a");
+                break;
+                case 1:
+                printf("b");
+                break;
+                case 2:
+                printf("c");
+                break;
+                case 3:
+                printf("d");
+                break;
+                case 4:
+                printf("e");
+                break;
+                case 5:
+                printf("f");
+                break;
+                case 6:
+                printf("g");
+                break;
+                case 7:
+                printf("h");
+                break;
+                default:
+                printf("?");
+                break;
+        }
+        switch(b)
+        {
+                case 0:
+                printf("8\n");
+                break;
+                case 1:
+                printf("7\n");
+                break;
+                case 2:
+                printf("6\n");
+                break;
+                case 3:
+                printf("5\n");
+                break;
+                case 4:
+                printf("4\n");
+                break;
+                case 5:
+                printf("3\n");
+                break;
+                case 6:
+                printf("2\n");
+                break;
+                case 7:
+                printf("1\n");
+                break;
+                default:
+                printf("?\n");
+                break;
+        }
+}
 void main()
 {
         int del;
@@ -338,7 +417,7 @@ void move_finder()
 {
         input_function(0);
         printf("In move\n");
-        int mo,c;
+        int c;
         mo=0;
         c=0;
         printf("%d %d \n",choice1,choice2);
@@ -756,7 +835,104 @@ void move_finder()
                         }
                         else
                         {
-                                
+                                int re;
+                                for(re=1;re<8;re++)
+                                {
+                                        if(re+choice1==8 || re+choice2==8)
+                                        {
+                                                break;
+                                        }
+                                        if(board[re+choice1][re+choice2]==0)
+                                        {
+                                                moves[mo]=((re+choice1)*10)+(re+choice2);
+                                                mo++;
+                                        }
+                                        if(board[re+choice1][re+choice2]<0)
+                                        {
+                                                moves[mo]=((re+choice1)*10)+(re+choice2);
+                                                capture_indexes[c]=mo;
+                                                c++;
+                                                mo++;
+                                                break;
+                                        }
+                                        if(board[re+choice1][re+choice2]>0)
+                                        {
+                                                break;
+                                        }
+                                }
+                                for(re=1;re<8;re++)
+                                {
+                                        if(re+choice1==8 || choice2-re==-1)
+                                        {
+                                                break;
+                                        }
+                                        if(board[re+choice1][choice2-re]==0)
+                                        {
+                                                moves[mo]=((re+choice1)*10)+(choice2-re);
+                                                mo++;
+                                        }
+                                        if(board[re+choice1][choice2-re]<0)
+                                        {
+                                                moves[mo]=((re+choice1)*10)+(choice2-re);
+                                                capture_indexes[c]=mo;
+                                                c++;
+                                                mo++;
+                                                break;
+                                        }
+                                        if(board[re+choice1][choice2-re]>0)
+                                        {
+                                                break;
+                                        }
+                                }
+                                for(re=1;re<8;re++)
+                                {
+                                        if(choice1-re==-1 || choice2-re==-1)
+                                        {
+                                                break;
+                                        }
+                                        if(board[choice1-re][choice2-re]==0)
+                                        {
+                                                moves[mo]=((choice1-re)*10)+(choice2-re);
+                                                mo++;
+                                        }
+                                        if(board[choice1-re][choice2-re]<0)
+                                        {
+                                                moves[mo]=((choice1-re)*10)+(choice2-re);
+                                                capture_indexes[c]=mo;
+                                                c++;
+                                                mo++;
+                                                break;
+                                        }
+                                        if(board[choice1-re][choice2-re]>0)
+                                        {
+                                                break;
+                                        }
+                                }
+                                for(re=1;re<8;re++)
+                                {
+                                        if(choice1-re==-1 || re+choice2==8)
+                                        {
+                                                printf("hey");
+                                                break;
+                                        }
+                                        if(board[choice1-re][re+choice2]==0)
+                                        {
+                                                moves[mo]=((choice1-re)*10)+(re+choice2);
+                                                mo++;
+                                        }
+                                        if(board[choice1-re][re+choice2]<0)
+                                        {
+                                                moves[mo]=((choice1-re)*10)+(re+choice2);
+                                                capture_indexes[c]=mo;
+                                                c++;
+                                                mo++;
+                                                break;
+                                        }
+                                        if(board[choice1-re][re+choice2]>0)
+                                        {
+                                                break;
+                                        }
+                                }
                         }
                         mo=0;
                         break;
@@ -769,7 +945,103 @@ void move_finder()
                         }
                         else
                         {
-                                
+                                int re;
+                                for(re=1;re<8;re++)
+                                {
+                                        if(re+choice1==8 || re+choice2==8)
+                                        {
+                                                break;
+                                        }
+                                        if(board[re+choice1][re+choice2]==0)
+                                        {
+                                                moves[mo]=((re+choice1)*10)+(re+choice2);
+                                                mo++;
+                                        }
+                                        if(board[re+choice1][re+choice2]>0)
+                                        {
+                                                moves[mo]=((re+choice1)*10)+(re+choice2);
+                                                capture_indexes[c]=mo;
+                                                c++;
+                                                mo++;
+                                                break;
+                                        }
+                                        if(board[re+choice1][re+choice2]<0)
+                                        {
+                                                break;
+                                        }
+                                }
+                                for(re=1;re<8;re++)
+                                {
+                                        if(re+choice1==8 || choice2-re==-1)
+                                        {
+                                                break;
+                                        }
+                                        if(board[re+choice1][choice2-re]==0)
+                                        {
+                                                moves[mo]=((re+choice1)*10)+(choice2-re);
+                                                mo++;
+                                        }
+                                        if(board[re+choice1][choice2-re]>0)
+                                        {
+                                                moves[mo]=((re+choice1)*10)+(choice2-re);
+                                                capture_indexes[c]=mo;
+                                                c++;
+                                                mo++;
+                                                break;
+                                        }
+                                        if(board[re+choice1][choice2-re]<0)
+                                        {
+                                                break;
+                                        }
+                                }
+                                for(re=1;re<8;re++)
+                                {
+                                        if(choice1-re==-1 || choice2-re==-1)
+                                        {
+                                                break;
+                                        }
+                                        if(board[choice1-re][choice2-re]==0)
+                                        {
+                                                moves[mo]=((choice1-re)*10)+(choice2-re);
+                                                mo++;
+                                        }
+                                        if(board[choice1-re][choice2-re]>0)
+                                        {
+                                                moves[mo]=((choice1-re)*10)+(choice2-re);
+                                                capture_indexes[c]=mo;
+                                                c++;
+                                                mo++;
+                                                break;
+                                        }
+                                        if(board[choice1-re][choice2-re]<0)
+                                        {
+                                                break;
+                                        }
+                                }
+                                for(re=1;re<8;re++)
+                                {
+                                        if(choice1-re==-1 || re+choice2==8)
+                                        {
+                                                break;
+                                        }
+                                        if(board[choice1-re][re+choice2]==0)
+                                        {
+                                                moves[mo]=((choice1-re)*10)+(re+choice2);
+                                                mo++;
+                                        }
+                                        if(board[choice1-re][re+choice2]>0)
+                                        {
+                                                moves[mo]=((choice1-re)*10)+(re+choice2);
+                                                capture_indexes[c]=mo;
+                                                c++;
+                                                mo++;
+                                                break;
+                                        }
+                                        if(board[choice1-re][re+choice2]<0)
+                                        {
+                                                break;
+                                        }
+                                }    
                         }
                         mo=0;
                         break;
@@ -834,7 +1106,8 @@ int move_checker()
                                 int asd;
                                 for(asd=0;asd<=ij;asd++)
                                 {
-                                        printf("%d ",moves[asd]);
+                                        printf("%d",moves[asd]);
+                                        movedisp(moves[asd]);
                                         if(moves[asd]==checker)
                                         {
                                                 ij=0;
