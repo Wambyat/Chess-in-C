@@ -20,8 +20,8 @@ int board[8][8]=
         {2,3,4,5,6,4,3,2},
         {1,1,1,1,1,1,1,1},
         {0,0,0,0,0,0,0,0},
-        {0,0,0,-4,0,0,0,0},
-        {0,0,4,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0},
         {0,0,0,0,0,0,0,0},
         {-1,-1,-1,-1,-1,-1,-1,-1},
         {-2,-3,-4,-5,-6,-4,-3,-2}
@@ -33,13 +33,16 @@ int board[8][8]=
         {0,0,0,0,0,0,-1,0},
         {0,0,0,0,0,0,0,0},
         {0,0,0,0,0,0,0,0},
-        {0,0,4,0,0,0,0,0},
         {0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0},
+        {0,0,0,-6,0,0,0,0},
+        {0,0,-2,6,0,0,0,0},
         {0,0,0,0,0,0,0,0}
     };
 */
 int mo;
+int ca;
+int captured_piece;
+
 //This array is used to store all moves the pieces can move to
 int moves[50];
 
@@ -69,6 +72,16 @@ int move_checker();
 
 //These variables accept the values.
 char c[2],d[2];
+
+//These 2 functions are to find bishop and rook moves(used for queen as well)
+void bishopwhite();
+void bishopblack();
+void rookwhite();
+void rookblack();
+
+//This is the check function
+int check_checker(int);
+
 //to delete later
 void movedisp(int a)
 {
@@ -158,6 +171,16 @@ void main()
         captured=0;
         while(c[0]!='Z')
         {
+                if(captured_piece==6)
+                {
+                        printf("White win");
+                        break;
+                }
+                else if(captured_piece==-6)
+                {
+                        printf("Black win");
+                        break;
+                }
                 disp(board);
                 //This is just some code that saves the first value because c is wierd. Reason it being used is because
                 //C was deleting the first value of the lastest array that was accessed. I have no clue why this is happening 
@@ -187,6 +210,7 @@ void main()
                         }
                         else
                         {
+                                captured_piece=board[mov1][mov2];
                                 board[choice1][choice2]=0;
                         }
                         board[mov1][mov2]=te;
@@ -212,6 +236,7 @@ void main()
                         }
                         else
                         {
+                                captured_piece=board[mov1][mov2];
                                 board[choice1][choice2]=0;
                         }
                         board[mov1][mov2]=te;
@@ -297,7 +322,7 @@ void disp()
                                         printf("WROOK   ");
                                         break;
                                 case 3:
-                                        printf("BKNIGHT ");
+                                        printf("BKINGHT ");
                                         break;
                                 case -3:
                                         printf("WKNIGHT ");
@@ -324,7 +349,7 @@ void disp()
                                         printf("  -     "); 
                         }
                 }
-                printf("\n");
+                printf("\n\n");
         }
         //This is for displaying the letter on the bottom 
         printf("          A       B       C       D       E       F       G       H    \n");
@@ -417,9 +442,8 @@ void move_finder()
 {
         input_function(0);
         printf("In move\n");
-        int c;
         mo=0;
-        c=0;
+        ca=0;
         printf("%d %d \n",choice1,choice2);
         switch(board[choice1][choice2])
         {
@@ -449,9 +473,8 @@ void move_finder()
                                 if(board[choice1+1][choice2+1]<0)
                                 {
                                         moves[mo]=((choice1+1)*10)+choice2+1;
-                                        capture_indexes[c]=mo;
-                                        printf("CAP\n");
-                                        c++;
+                                        capture_indexes[ca]=mo;
+                                        ca++;
                                         mo++;
                                 }
                         }
@@ -460,9 +483,8 @@ void move_finder()
                                 if(board[choice1+1][choice2-1]<0)
                                 {
                                         moves[mo]=((choice1+1)*10)+choice2-1;
-                                        capture_indexes[c]=mo;
-                                        printf("CAP\n");
-                                        c++;
+                                        capture_indexes[ca]=mo;
+                                        ca++;
                                         mo++;
                                 }
                         }
@@ -495,9 +517,8 @@ void move_finder()
                                 if(board[choice1-1][choice2+1]>0)
                                 {
                                         moves[mo]=((choice1-1)*10)+choice2+1;
-                                        capture_indexes[c]=mo;
-                                        printf("CAP\n");
-                                        c++;
+                                        capture_indexes[ca]=mo;
+                                        ca++;
                                         mo++;
                                 }
                         }
@@ -506,9 +527,8 @@ void move_finder()
                                 if(board[choice1-1][choice2-1]>0)
                                 {
                                         moves[mo]=((choice1-1)*10)+choice2-1;
-                                        capture_indexes[c]=mo;
-                                        printf("CAP\n");
-                                        c++;
+                                        capture_indexes[ca]=mo;
+                                        ca++;
                                         mo++;
                                 }
                         }
@@ -523,100 +543,7 @@ void move_finder()
                         }
                         else
                         {
-                               int re;
-                               for(re=choice1+1;re<8;re++)
-                               {
-                                       if(board[re][choice2]==0)
-                                       {
-                                               printf("ED ");
-                                               moves[mo]=(re*10)+choice2;
-                                               mo++;
-                                       }
-                                       if(board[re][choice2]<0)
-                                       {
-                                               printf("WD ");
-                                               moves[mo]=(re*10)+choice2;
-                                               capture_indexes[c]=mo;
-                                               c++;
-                                               mo++;
-                                               break;
-                                       }
-                                       if(board[re][choice2]>0)
-                                       {
-                                               printf("BD ");
-                                               break;
-                                       }
-                               }
-                               for(re=choice1-1;re>-1;re--)
-                               {
-                                       if(board[re][choice2]==0)
-                                       {
-                                               printf("EU ");
-                                               moves[mo]=(re*10)+choice2;
-                                               mo++;
-                                       }
-                                       if(board[re][choice2]<0)
-                                       {
-                                               printf("WU ");
-                                               moves[mo]=(re*10)+choice2;
-                                               capture_indexes[c]=mo;
-                                               c++;
-                                               mo++;
-                                               break;
-                                       }
-                                       if(board[re][choice2]>0)
-                                       {
-                                               printf("BU ");
-                                               break;
-                                       }
-                               }
-                               for(re=choice2+1;re<8;re++)
-                               {
-                                       if(board[choice1][re]==0)
-                                       {
-                                               
-                                               printf("ER ");
-                                               moves[mo]=(choice1*10)+re;
-                                               mo++;
-                                       }
-                                       if(board[choice1][re]<0)
-                                       {
-                                               printf("WR ");
-                                               moves[mo]=(choice1*10)+re;
-                                               capture_indexes[c]=mo;
-                                               c++;
-                                               mo++;
-                                               break;
-                                       }
-                                       if(board[choice1][re]>0)
-                                       {
-                                               printf("BR ");
-                                               break;
-                                       }
-                               }
-                               for(re=choice2-1;re>-1;re--)
-                               {
-                                       if(board[choice1][re]==0)
-                                       {
-                                               printf("EL ");
-                                               moves[mo]=(choice1*10)+re;
-                                               mo++;
-                                       }
-                                       if(board[choice1][re]<0)
-                                       {
-                                               printf("WL ");
-                                               moves[mo]=(choice1*10)+re;
-                                               capture_indexes[c]=mo;
-                                               c++;
-                                               mo++;
-                                               break;
-                                       }
-                                       if(board[choice1][re]>0)
-                                       {
-                                               printf("BL ");
-                                               break;
-                                       }
-                               }
+                               rookblack();
                         }
                         mo=0;
                         break;
@@ -629,100 +556,7 @@ void move_finder()
                         }
                         else
                         {
-                               int re;
-                               for(re=choice1+1;re<8;re++)
-                               {
-                                       if(board[re][choice2]==0)
-                                       {
-                                               printf("ED ");
-                                               moves[mo]=(re*10)+choice2;
-                                               mo++;
-                                       }
-                                       if(board[re][choice2]>0)
-                                       {
-                                               printf("BD ");
-                                               moves[mo]=(re*10)+choice2;
-                                               capture_indexes[c]=mo;
-                                               c++;
-                                               mo++;
-                                               break;
-                                       }
-                                       if(board[re][choice2]<0)
-                                       {
-                                               printf("WD ");
-                                               break;
-                                       }
-                               }
-                               for(re=choice1-1;re>-1;re--)
-                               {
-                                       if(board[re][choice2]==0)
-                                       {
-                                               printf("EU ");
-                                               moves[mo]=(re*10)+choice2;
-                                               mo++;
-                                       }
-                                       if(board[re][choice2]>0)
-                                       {
-                                               printf("BU ");
-                                               moves[mo]=(re*10)+choice2;
-                                               capture_indexes[c]=mo;
-                                               c++;
-                                               mo++;
-                                               break;
-                                       }
-                                       if(board[re][choice2]<0)
-                                       {
-                                               printf("WU ");
-                                               break;
-                                       }
-                               }
-                               for(re=choice2+1;re<8;re++)
-                               {
-                                       if(board[choice1][re]==0)
-                                       {
-                                               
-                                               printf("ER ");
-                                               moves[mo]=(choice1*10)+re;
-                                               mo++;
-                                       }
-                                       if(board[choice1][re]>0)
-                                       {
-                                               printf("BR ");
-                                               moves[mo]=(choice1*10)+re;
-                                               capture_indexes[c]=mo;
-                                               c++;
-                                               mo++;
-                                               break;
-                                       }
-                                       if(board[choice1][re]<0)
-                                       {
-                                               printf("WR ");
-                                               break;
-                                       }
-                               }
-                               for(re=choice2-1;re>-1;re--)
-                               {
-                                       if(board[choice1][re]==0)
-                                       {
-                                               printf("EL ");
-                                               moves[mo]=(choice1*10)+re;
-                                               mo++;
-                                       }
-                                       if(board[choice1][re]>0)
-                                       {
-                                               printf("BL ");
-                                               moves[mo]=(choice1*10)+re;
-                                               capture_indexes[c]=mo;
-                                               c++;
-                                               mo++;
-                                               break;
-                                       }
-                                       if(board[choice1][re]<0)
-                                       {
-                                               printf("WL ");
-                                               break;
-                                       }
-                               }
+                                rookwhite();
                         }
                         mo=0;
                         break;
@@ -768,8 +602,8 @@ void move_finder()
                                         if (board[a[cho]][b[cho]]<0)
                                         {
                                                 moves[mo]=(a[cho]*10)+b[cho];
-                                                capture_indexes[c]=mo;
-                                                c++;
+                                                capture_indexes[ca]=mo;
+                                                ca++;
                                                 mo++;
                                         }
                                 }
@@ -818,8 +652,8 @@ void move_finder()
                                         if (board[a[cho]][b[cho]]>0)
                                         {
                                                 moves[mo]=(a[cho]*10)+b[cho];
-                                                capture_indexes[c]=mo;
-                                                c++;
+                                                capture_indexes[ca]=mo;
+                                                ca++;
                                                 mo++;
                                         }
                                 }
@@ -835,104 +669,7 @@ void move_finder()
                         }
                         else
                         {
-                                int re;
-                                for(re=1;re<8;re++)
-                                {
-                                        if(re+choice1==8 || re+choice2==8)
-                                        {
-                                                break;
-                                        }
-                                        if(board[re+choice1][re+choice2]==0)
-                                        {
-                                                moves[mo]=((re+choice1)*10)+(re+choice2);
-                                                mo++;
-                                        }
-                                        if(board[re+choice1][re+choice2]<0)
-                                        {
-                                                moves[mo]=((re+choice1)*10)+(re+choice2);
-                                                capture_indexes[c]=mo;
-                                                c++;
-                                                mo++;
-                                                break;
-                                        }
-                                        if(board[re+choice1][re+choice2]>0)
-                                        {
-                                                break;
-                                        }
-                                }
-                                for(re=1;re<8;re++)
-                                {
-                                        if(re+choice1==8 || choice2-re==-1)
-                                        {
-                                                break;
-                                        }
-                                        if(board[re+choice1][choice2-re]==0)
-                                        {
-                                                moves[mo]=((re+choice1)*10)+(choice2-re);
-                                                mo++;
-                                        }
-                                        if(board[re+choice1][choice2-re]<0)
-                                        {
-                                                moves[mo]=((re+choice1)*10)+(choice2-re);
-                                                capture_indexes[c]=mo;
-                                                c++;
-                                                mo++;
-                                                break;
-                                        }
-                                        if(board[re+choice1][choice2-re]>0)
-                                        {
-                                                break;
-                                        }
-                                }
-                                for(re=1;re<8;re++)
-                                {
-                                        if(choice1-re==-1 || choice2-re==-1)
-                                        {
-                                                break;
-                                        }
-                                        if(board[choice1-re][choice2-re]==0)
-                                        {
-                                                moves[mo]=((choice1-re)*10)+(choice2-re);
-                                                mo++;
-                                        }
-                                        if(board[choice1-re][choice2-re]<0)
-                                        {
-                                                moves[mo]=((choice1-re)*10)+(choice2-re);
-                                                capture_indexes[c]=mo;
-                                                c++;
-                                                mo++;
-                                                break;
-                                        }
-                                        if(board[choice1-re][choice2-re]>0)
-                                        {
-                                                break;
-                                        }
-                                }
-                                for(re=1;re<8;re++)
-                                {
-                                        if(choice1-re==-1 || re+choice2==8)
-                                        {
-                                                printf("hey");
-                                                break;
-                                        }
-                                        if(board[choice1-re][re+choice2]==0)
-                                        {
-                                                moves[mo]=((choice1-re)*10)+(re+choice2);
-                                                mo++;
-                                        }
-                                        if(board[choice1-re][re+choice2]<0)
-                                        {
-                                                moves[mo]=((choice1-re)*10)+(re+choice2);
-                                                capture_indexes[c]=mo;
-                                                c++;
-                                                mo++;
-                                                break;
-                                        }
-                                        if(board[choice1-re][re+choice2]>0)
-                                        {
-                                                break;
-                                        }
-                                }
+                                bishopblack();
                         }
                         mo=0;
                         break;
@@ -945,103 +682,7 @@ void move_finder()
                         }
                         else
                         {
-                                int re;
-                                for(re=1;re<8;re++)
-                                {
-                                        if(re+choice1==8 || re+choice2==8)
-                                        {
-                                                break;
-                                        }
-                                        if(board[re+choice1][re+choice2]==0)
-                                        {
-                                                moves[mo]=((re+choice1)*10)+(re+choice2);
-                                                mo++;
-                                        }
-                                        if(board[re+choice1][re+choice2]>0)
-                                        {
-                                                moves[mo]=((re+choice1)*10)+(re+choice2);
-                                                capture_indexes[c]=mo;
-                                                c++;
-                                                mo++;
-                                                break;
-                                        }
-                                        if(board[re+choice1][re+choice2]<0)
-                                        {
-                                                break;
-                                        }
-                                }
-                                for(re=1;re<8;re++)
-                                {
-                                        if(re+choice1==8 || choice2-re==-1)
-                                        {
-                                                break;
-                                        }
-                                        if(board[re+choice1][choice2-re]==0)
-                                        {
-                                                moves[mo]=((re+choice1)*10)+(choice2-re);
-                                                mo++;
-                                        }
-                                        if(board[re+choice1][choice2-re]>0)
-                                        {
-                                                moves[mo]=((re+choice1)*10)+(choice2-re);
-                                                capture_indexes[c]=mo;
-                                                c++;
-                                                mo++;
-                                                break;
-                                        }
-                                        if(board[re+choice1][choice2-re]<0)
-                                        {
-                                                break;
-                                        }
-                                }
-                                for(re=1;re<8;re++)
-                                {
-                                        if(choice1-re==-1 || choice2-re==-1)
-                                        {
-                                                break;
-                                        }
-                                        if(board[choice1-re][choice2-re]==0)
-                                        {
-                                                moves[mo]=((choice1-re)*10)+(choice2-re);
-                                                mo++;
-                                        }
-                                        if(board[choice1-re][choice2-re]>0)
-                                        {
-                                                moves[mo]=((choice1-re)*10)+(choice2-re);
-                                                capture_indexes[c]=mo;
-                                                c++;
-                                                mo++;
-                                                break;
-                                        }
-                                        if(board[choice1-re][choice2-re]<0)
-                                        {
-                                                break;
-                                        }
-                                }
-                                for(re=1;re<8;re++)
-                                {
-                                        if(choice1-re==-1 || re+choice2==8)
-                                        {
-                                                break;
-                                        }
-                                        if(board[choice1-re][re+choice2]==0)
-                                        {
-                                                moves[mo]=((choice1-re)*10)+(re+choice2);
-                                                mo++;
-                                        }
-                                        if(board[choice1-re][re+choice2]>0)
-                                        {
-                                                moves[mo]=((choice1-re)*10)+(re+choice2);
-                                                capture_indexes[c]=mo;
-                                                c++;
-                                                mo++;
-                                                break;
-                                        }
-                                        if(board[choice1-re][re+choice2]<0)
-                                        {
-                                                break;
-                                        }
-                                }    
+                                bishopwhite();
                         }
                         mo=0;
                         break;
@@ -1052,6 +693,12 @@ void move_finder()
                                 move_finder();
                                 break;
                         }
+                        else
+                        {
+                                bishopblack();
+                                rookblack();
+                                mo=0;
+                        }
                         break;
                 case -5:
                         if(turn!=2)
@@ -1059,6 +706,12 @@ void move_finder()
                                 printf("Please choose a black piece because it is black's turn.\n");
                                 move_finder();
                                 break;
+                        }
+                        else
+                        {
+                                bishopwhite();
+                                rookwhite();
+                                mo=0;
                         }
                         break;
                 case 6:
@@ -1068,6 +721,31 @@ void move_finder()
                                 move_finder();
                                 break;
                         }
+                        else
+                        {
+                                for(int i=-1;i<2;i++)
+                                {
+                                        for (int j=-1;j<2;j++)
+                                        {
+                                                if((choice1+i)!=-1 && (choice1+i)!=8 && (choice2+j)!=-1 && (choice2+j)!=8)
+                                                {
+                                                        if(board[choice1+i][choice2+j]==0)
+                                                        {
+                                                                moves[mo]=((choice1+i)*10)+(choice2+j);
+                                                                mo++;
+                                                        }
+                                                        if(board[choice1+i][choice2+j]<0)
+                                                        {
+                                                                moves[mo]=((choice1+i)*10)+(choice2+j);
+                                                                capture_indexes[ca]=mo;
+                                                                ca++;
+                                                                mo++;
+                                                        }
+                                                }
+                                        }
+                                }
+                        }
+                        mo=0;
                         break;
                 case -6:
                         if(turn!=2)
@@ -1076,6 +754,31 @@ void move_finder()
                                 move_finder();
                                 break;
                         }
+                        else
+                        {
+                                for(int i=-1;i<2;i++)
+                                {
+                                        for (int j=-1;j<2;j++)
+                                        {
+                                                if((choice1+i)!=-1 && (choice1+i)!=8 && (choice2+j)!=-1 && (choice2+j)!=8)
+                                                {
+                                                        if(board[choice1+i][choice2+j]==0)
+                                                        {
+                                                                moves[mo]=((choice1+i)*10)+(choice2+j);
+                                                                mo++;
+                                                        }
+                                                        if(board[choice1+i][choice2+j]>0)
+                                                        {
+                                                                moves[mo]=((choice1+i)*10)+(choice2+j);
+                                                                capture_indexes[ca]=mo;
+                                                                ca++;
+                                                                mo++;
+                                                        }
+                                                }
+                                        }
+                                }
+                        }
+                        mo=0;
                         break;
                 default: 
                         printf("Blank Space selected, choose valid space.\n");
@@ -1106,7 +809,6 @@ int move_checker()
                                 int asd;
                                 for(asd=0;asd<=ij;asd++)
                                 {
-                                        printf("%d",moves[asd]);
                                         movedisp(moves[asd]);
                                         if(moves[asd]==checker)
                                         {
@@ -1138,4 +840,378 @@ int move_checker()
                 }
         }
         return 0;
+}
+
+void bishopwhite()
+{
+        int re;
+        for(re=1;re<8;re++)
+        {
+                if(re+choice1==8 || re+choice2==8)
+                {
+                        break;
+                }
+                if(board[re+choice1][re+choice2]==0)
+                {
+                        moves[mo]=((re+choice1)*10)+(re+choice2);
+                        mo++;
+                }
+                if(board[re+choice1][re+choice2]>0)
+                {
+                        moves[mo]=((re+choice1)*10)+(re+choice2);
+                        capture_indexes[ca]=mo;
+                        ca++;
+                        mo++;
+                        break;
+                }
+                if(board[re+choice1][re+choice2]<0)
+                {
+                        break;
+                }
+        }
+        for(re=1;re<8;re++)
+        {
+                if(re+choice1==8 || choice2-re==-1)
+                {
+                        break;
+                }
+                if(board[re+choice1][choice2-re]==0)
+                {
+                        moves[mo]=((re+choice1)*10)+(choice2-re);
+                        mo++;
+                }
+                if(board[re+choice1][choice2-re]>0)
+                {
+                        moves[mo]=((re+choice1)*10)+(choice2-re);
+                        capture_indexes[ca]=mo;
+                        ca++;
+                        mo++;
+                        break;
+                }
+                if(board[re+choice1][choice2-re]<0)
+                {
+                        break;
+                }
+        }
+        for(re=1;re<8;re++)
+        {
+                if(choice1-re==-1 || choice2-re==-1)
+                {
+                        break;
+                }
+                if(board[choice1-re][choice2-re]==0)
+                {
+                        moves[mo]=((choice1-re)*10)+(choice2-re);
+                        mo++;
+                }
+                if(board[choice1-re][choice2-re]>0)
+                {
+                        moves[mo]=((choice1-re)*10)+(choice2-re);
+                        capture_indexes[ca]=mo;
+                        ca++;
+                        mo++;
+                        break;
+                }
+                if(board[choice1-re][choice2-re]<0)
+                {
+                        break;
+                }
+        }
+        for(re=1;re<8;re++)
+        {
+                if(choice1-re==-1 || re+choice2==8)
+                {
+                        break;
+                }
+                if(board[choice1-re][re+choice2]==0)
+                {
+                        moves[mo]=((choice1-re)*10)+(re+choice2);
+                        mo++;
+                }
+                if(board[choice1-re][re+choice2]>0)
+                {
+                        moves[mo]=((choice1-re)*10)+(re+choice2);
+                        capture_indexes[ca]=mo;
+                        ca++;
+                        mo++;
+                        break;
+                }
+                if(board[choice1-re][re+choice2]<0)
+                {
+                        break;
+                }
+        }
+}
+void bishopblack()
+{
+        int re;
+        for(re=1;re<8;re++)
+        {
+                if(re+choice1==8 || re+choice2==8)
+                {
+                        break;
+                }
+                if(board[re+choice1][re+choice2]==0)
+                {
+                        moves[mo]=((re+choice1)*10)+(re+choice2);
+                        mo++;
+                }
+                if(board[re+choice1][re+choice2]<0)
+                {
+                        moves[mo]=((re+choice1)*10)+(re+choice2);
+                        capture_indexes[ca]=mo;
+                        ca++;
+                        mo++;
+                        break;
+                }
+                if(board[re+choice1][re+choice2]>0)
+                {
+                        break;
+                }
+        }
+        for(re=1;re<8;re++)
+        {
+                if(re+choice1==8 || choice2-re==-1)
+                {
+                        break;
+                }
+                if(board[re+choice1][choice2-re]==0)
+                {
+                        moves[mo]=((re+choice1)*10)+(choice2-re);
+                        mo++;
+                }
+                if(board[re+choice1][choice2-re]<0)
+                {
+                        moves[mo]=((re+choice1)*10)+(choice2-re);
+                        capture_indexes[ca]=mo;
+                        ca++;
+                        mo++;
+                        break;
+                }
+                if(board[re+choice1][choice2-re]>0)
+                {
+                        break;
+                }
+        }
+        for(re=1;re<8;re++)
+        {
+                if(choice1-re==-1 || choice2-re==-1)
+                {
+                        break;
+                }
+                if(board[choice1-re][choice2-re]==0)
+                {
+                        moves[mo]=((choice1-re)*10)+(choice2-re);
+                        mo++;
+                }
+                if(board[choice1-re][choice2-re]<0)
+                {
+                        moves[mo]=((choice1-re)*10)+(choice2-re);
+                        capture_indexes[ca]=mo;
+                        ca++;
+                        mo++;
+                        break;
+                }
+                if(board[choice1-re][choice2-re]>0)
+                {
+                        break;
+                }
+        }
+        for(re=1;re<8;re++)
+        {
+                if(choice1-re==-1 || re+choice2==8)
+                {
+                        break;
+                }
+                if(board[choice1-re][re+choice2]==0)
+                {
+                        moves[mo]=((choice1-re)*10)+(re+choice2);
+                        mo++;
+                }
+                if(board[choice1-re][re+choice2]<0)
+                {
+                        moves[mo]=((choice1-re)*10)+(re+choice2);
+                        capture_indexes[ca]=mo;
+                        ca++;
+                        mo++;
+                        break;
+                }
+                if(board[choice1-re][re+choice2]>0)
+                {
+                        break;
+                }
+        }
+}
+void rookwhite()
+{
+int re;
+        for(re=choice1+1;re<8;re++)
+        {
+                if(board[re][choice2]==0)
+                {
+                        moves[mo]=(re*10)+choice2;
+                        mo++;
+                }
+                if(board[re][choice2]>0)
+                {
+                        moves[mo]=(re*10)+choice2;
+                        capture_indexes[ca]=mo;
+                        ca++;
+                        mo++;
+                        break;
+                }
+                if(board[re][choice2]<0)
+                {
+                        break;
+                }
+        }
+        for(re=choice1-1;re>-1;re--)
+        {
+                if(board[re][choice2]==0)
+                {
+                        moves[mo]=(re*10)+choice2;
+                        mo++;
+                }
+                if(board[re][choice2]>0)
+                {
+                        moves[mo]=(re*10)+choice2;
+                        capture_indexes[ca]=mo;
+                        ca++;
+                        mo++;
+                        break;
+                }
+                if(board[re][choice2]<0)
+                {
+                        break;
+                }
+        }
+        for(re=choice2+1;re<8;re++)
+        {
+                if(board[choice1][re]==0)
+                {
+                        moves[mo]=(choice1*10)+re;
+                        mo++;
+                }
+                if(board[choice1][re]>0)
+                {
+                        moves[mo]=(choice1*10)+re;
+                        capture_indexes[ca]=mo;
+                        ca++;
+                        mo++;
+                        break;
+                }
+                if(board[choice1][re]<0)
+                {
+                        break;
+                }
+        }
+        for(re=choice2-1;re>-1;re--)
+        {
+                if(board[choice1][re]==0)
+                {
+                        moves[mo]=(choice1*10)+re;
+                        mo++;
+                }
+                if(board[choice1][re]>0)
+                {
+                        moves[mo]=(choice1*10)+re;
+                        capture_indexes[ca]=mo;
+                        ca++;
+                        mo++;
+                        break;
+                }
+                if(board[choice1][re]<0)
+                {
+                        break;
+                }
+        }
+}
+
+void rookblack()
+{
+        int re;
+        for(re=choice1+1;re<8;re++)
+        {
+                if(board[re][choice2]==0)
+                {
+                        moves[mo]=(re*10)+choice2;
+                        mo++;
+                }
+                if(board[re][choice2]<0)
+                {
+                        moves[mo]=(re*10)+choice2;
+                        capture_indexes[ca]=mo;
+                        ca++;
+                        mo++;
+                        break;
+                }
+                if(board[re][choice2]>0)
+                {
+                        break;
+                }
+        }
+        for(re=choice1-1;re>-1;re--)
+        {
+                if(board[re][choice2]==0)
+                {
+                        moves[mo]=(re*10)+choice2;
+                        mo++;
+                }
+                if(board[re][choice2]<0)
+                {
+                        moves[mo]=(re*10)+choice2;
+                        capture_indexes[ca]=mo;
+                        ca++;
+                        mo++;
+                        break;
+                }
+                if(board[re][choice2]>0)
+                {
+                        break;
+                }
+        }
+        for(re=choice2+1;re<8;re++)
+        {
+                if(board[choice1][re]==0)
+                {
+                        moves[mo]=(choice1*10)+re;
+                        mo++;
+                }
+                if(board[choice1][re]<0)
+                {
+                        moves[mo]=(choice1*10)+re;
+                        capture_indexes[ca]=mo;
+                        ca++;
+                        mo++;
+                        break;
+                }
+                if(board[choice1][re]>0)
+                {
+                        break;
+                }
+        }
+        for(re=choice2-1;re>-1;re--)
+        {
+                if(board[choice1][re]==0)
+                {
+                        moves[mo]=(choice1*10)+re;
+                        mo++;
+                }
+                if(board[choice1][re]<0)
+                {
+                        moves[mo]=(choice1*10)+re;
+                        capture_indexes[ca]=mo;
+                        ca++;
+                        mo++;
+                        break;
+                }
+                if(board[choice1][re]>0)
+                {
+                        break;
+                }
+        }
+}
+int check_checker(int cond)
+{
+        
 }
