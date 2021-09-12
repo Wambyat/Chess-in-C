@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <conio.h>
+#include "displ.h"
+
 //This array represents the chess board.
 //Each element represents one chess piece or an empty space.
 //0=>empty space
@@ -12,7 +14,6 @@
 //4=>Bishop
 //5=>Queen
 //6=>King
-
 //Declared as global variable to allow easy access for all function especially for move checking(Coming Soon!)
 
 int board[8][8]=
@@ -26,6 +27,7 @@ int board[8][8]=
         {-1,-1,-1,-1,-1,-1,-1,-1},
         {-2,-3,-4,-5,-6,-4,-3,-2}
     };
+
 /*
 int board[8][8]=
     {
@@ -39,7 +41,7 @@ int board[8][8]=
         {0,0,0,0,0,0,0,0}
     };
 */
-int mo;
+int mo,ij;
 int ca;
 int captured_piece;
 
@@ -61,7 +63,7 @@ int choice1,choice2,mov1,mov2,bo2,turn;
 //This function sees what piece has been selected and modifies the moves array to display where the piece can move
 void move_finder();
 
-//This function is a stand-in for the gui. It will be replaced by the gui part of the project.
+//This function is the display function.
 void disp();
 
 //This function take the user inputs and converts them in to required input according to the matrix.
@@ -82,9 +84,10 @@ void rookblack();
 //This is the check function
 int check_checker(int);
 
-//to delete later
+/*to delete later
 void movedisp(int a)
 {
+        printf("\n%d ->",a);
         int b=a/10;
         int c=a%10;
         switch(c)
@@ -148,12 +151,14 @@ void movedisp(int a)
                 break;
         }
 }
+*/
 void main()
 {
+        welcome_splash();
         int del;
         for (del=0;del<50;del++)
         {
-                moves[del]=0;
+                moves[del]=-1;
                 capture_indexes[del]=-1;
         }
         //This is just some code that saves the first value because c is wierd. 
@@ -169,19 +174,36 @@ void main()
         //if turn is 2 then white moves.
         turn=2;
         captured=0;
+        int checking=0;
+        
         while(c[0]!='Z')
         {
+                system("cls");
                 if(captured_piece==6)
                 {
-                        printf("White win");
+                        system("cls");
+                        printf("White wins!");
                         break;
                 }
                 else if(captured_piece==-6)
                 {
-                        printf("Black win");
+                        system("cls");
+                        printf("Black wins!");
                         break;
                 }
+                
+                checking=check_checker(turn);
+                if(checking==1)
+                {
+                        check_splash();
+                }
+                for(cleaner_var=0;cleaner_var<50;cleaner_var++)
+                {
+                        moves[cleaner_var]=-1;
+                        capture_indexes[cleaner_var]=-1;
+                }
                 disp(board);
+
                 //This is just some code that saves the first value because c is wierd. Reason it being used is because
                 //C was deleting the first value of the lastest array that was accessed. I have no clue why this is happening 
                 //but I know it is happening because of scanf.
@@ -190,12 +212,12 @@ void main()
                 
                 while(valid_checker==1)
                 {
-                        move_finder();  
+                        move_finder(2);  
                         valid_checker=move_checker(); 
                 }
 
-                printf(" choice1,choice2-> %d,%d\n",choice1,choice2);
-                printf(" mov1,mov2-> %d,%d\n",mov1,mov2);
+                //printf(" choice1,choice2-> %d,%d\n",choice1,choice2);
+                //printf(" mov1,mov2-> %d,%d\n",mov1,mov2);
                 board[0][0]=bo2;
 
                 if (turn==2)
@@ -218,7 +240,7 @@ void main()
                         captured=0;
                         for(cleaner_var=0;cleaner_var<50;cleaner_var++)
                         {
-                                moves[cleaner_var]=0;
+                                moves[cleaner_var]=-1;
                                 capture_indexes[cleaner_var]=-1;
                         }
                         continue;
@@ -244,25 +266,11 @@ void main()
                         captured=0;
                         for(cleaner_var=0;cleaner_var<50;cleaner_var++)
                         {
-                                moves[cleaner_var]=0;
+                                moves[cleaner_var]=-1;
                                 capture_indexes[cleaner_var]=-1;
                         }
                 }
         }
-        
-        //ignore code from line 96 to 105 it is there for easy debugging
-        /*
-        int i2=0,j2=0;
-        for(i2=0;i2<=7;i2++)
-        {
-                for (j2=0;j2<=7;j2++)
-                {
-                        printf("%d",board[i2][j2]);
-                }
-                printf("\n");
-        }
-        disp(board);
-        */
 }
 
 //This is a basic display function that prints the board. This part of the code will be replaced by the gui.
@@ -322,7 +330,7 @@ void disp()
                                         printf("WROOK   ");
                                         break;
                                 case 3:
-                                        printf("BKINGHT ");
+                                        printf("BKNIGHT ");
                                         break;
                                 case -3:
                                         printf("WKNIGHT ");
@@ -361,7 +369,7 @@ void input_function(int inputvar)
         bo2=board[0][0];
         if (inputvar==0)
         {
-                printf("Select piece to be move? :");
+                printf("Select piece to be move-> ");
                 scanf("%s",c);
 
                 board[0][0]=bo2;
@@ -400,7 +408,7 @@ void input_function(int inputvar)
         }
         else
         {
-                printf("Move selected piece to ? :");
+                printf("Move piece to-> ");
                 scanf("%s",d);
 
                 board[0][0]=bo2;
@@ -438,20 +446,25 @@ void input_function(int inputvar)
                 }
         }
 }
-void move_finder()
+void move_finder(int test)
 {
-        input_function(0);
-        printf("In move\n");
+        if (test==2)
+        {
+                input_function(0);
+        }
+        //printf("In move\n");
         mo=0;
         ca=0;
-        printf("%d %d \n",choice1,choice2);
+        //printf("%d %d \n",choice1,choice2);
         switch(board[choice1][choice2])
         {
                 case 1:
                         if(turn!=1)
                         {
+                                system("cls");
+                                disp(board);
                                 printf("Please choose a white piece because it is white's turn.\n");
-                                move_finder();
+                                move_finder(2);
                                 break;
                         }
                         
@@ -488,13 +501,16 @@ void move_finder()
                                         mo++;
                                 }
                         }
+                        ij=mo;
                         mo=0;
                         break;
                 case -1: 
                         if(turn!=2)
                         {
+                                system("cls");
+                                disp(board);
                                 printf("Please choose a black piece because it is black's turn.\n");
-                                move_finder();
+                                move_finder(2);
                                 break;
                         }
                         mo=0;
@@ -532,39 +548,48 @@ void move_finder()
                                         mo++;
                                 }
                         }
+                        ij=mo;
                         mo=0;
                         break;
                 case 2:
                         if(turn!=1)
                         {
+                                system("cls");
+                                disp(board);
                                 printf("Please choose a white piece because it is white's turn.\n");
-                                move_finder();
+                                move_finder(2);
                                 break;
                         }
                         else
                         {
                                rookblack();
                         }
+                        ij=mo;
                         mo=0;
                         break;
                 case -2:
                         if(turn!=2)
                         {
+                                system("cls");
+                                disp(board);
                                 printf("Please choose a black piece because it is black's turn.\n");
-                                move_finder();
+                                move_finder(2);
                                 break;
                         }
                         else
                         {
                                 rookwhite();
                         }
+                        ij=mo;
                         mo=0;
                         break;
                 case 3:
                         if(turn!=1)
                         {
+                                system("cls");
+                                disp(board);
                                 printf("Please choose a white piece because it is white's turn.\n");
-                                move_finder();
+                                move_finder(2);
                                 break;
                         }
                         else
@@ -608,13 +633,16 @@ void move_finder()
                                         }
                                 }
                         }
+                        ij=mo;
                         mo=0;
                         break;
                 case -3:
                         if(turn!=2)
                         {
+                                system("cls");
+                                disp(board);
                                 printf("Please choose a black piece because it is black's turn.\n");
-                                move_finder();
+                                move_finder(2);
                                 break;
                         }
                         else
@@ -658,67 +686,82 @@ void move_finder()
                                         }
                                 }
                         }
+                        ij=mo;
                         mo=0;
                         break;
                 case 4:
                         if(turn!=1)
                         {
+                                system("cls");
+                                disp(board);
                                 printf("Please choose a white piece because it is white's turn.\n");
-                                move_finder();
+                                move_finder(2);
                                 break;
                         }
                         else
                         {
                                 bishopblack();
                         }
+                        ij=mo;
                         mo=0;
                         break;
                 case -4:
                         if(turn!=2)
                         {
+                                system("cls");
+                                disp(board);
                                 printf("Please choose a black piece because it is black's turn.\n");
-                                move_finder();
+                                move_finder(2);
                                 break;
                         }
                         else
                         {
                                 bishopwhite();
                         }
+                        ij=mo;
                         mo=0;
                         break;
                 case 5:
                         if(turn!=1)
                         {
+                                system("cls");
+                                disp(board);
                                 printf("Please choose a white piece because it is white's turn.\n");
-                                move_finder();
+                                move_finder(2);
                                 break;
                         }
                         else
                         {
                                 bishopblack();
                                 rookblack();
+                                ij=mo;
                                 mo=0;
                         }
                         break;
                 case -5:
                         if(turn!=2)
                         {
+                                system("cls");
+                                disp(board);
                                 printf("Please choose a black piece because it is black's turn.\n");
-                                move_finder();
+                                move_finder(2);
                                 break;
                         }
                         else
                         {
                                 bishopwhite();
                                 rookwhite();
+                                ij=mo;
                                 mo=0;
                         }
                         break;
                 case 6:
                         if(turn!=1)
                         {
+                                system("cls");
+                                disp(board);
                                 printf("Please choose a white piece because it is white's turn.\n");
-                                move_finder();
+                                move_finder(2);
                                 break;
                         }
                         else
@@ -745,13 +788,16 @@ void move_finder()
                                         }
                                 }
                         }
+                        ij=mo;
                         mo=0;
                         break;
                 case -6:
                         if(turn!=2)
                         {
+                                system("cls");
+                                disp(board);
                                 printf("Please choose a black piece because it is black's turn.\n");
-                                move_finder();
+                                move_finder(2);
                                 break;
                         }
                         else
@@ -778,66 +824,68 @@ void move_finder()
                                         }
                                 }
                         }
+                        ij=mo;
                         mo=0;
                         break;
                 default: 
+                        system("cls");
+                        disp(board);
                         printf("Blank Space selected, choose valid space.\n");
-                        move_finder();
+                        move_finder(2);
                         break;
-
         }
 }
 
 int move_checker()
 {
-        int ij=0,checker;
+        int checker;
         input_function(1);
-        for(ij=0;ij<50;ij++)
+        if (moves[ij]==-1)
         {
-                if (moves[ij]==0)
+                checker=(mov1*10)+mov2;
+                //printf("To move-> %d\n ",checker);
+                if(ij==0)
                 {
-                        checker=(mov1*10)+mov2;
-                        printf("To move-> %d\n ",checker);
-                        if(ij==0)
+                        printf("No Moves available.\n");
+                        return 1;
+                }
+                while(ij!=0)
+                {
+                        //asd is used to loop thru the moves
+                        int asd;
+                        //printf("%d",ij);
+                        for(asd=0;asd<ij;asd++)
                         {
-                                printf("No Moves available.\n");
+                                //movedisp(moves[asd]);
+                                if(moves[asd]==checker)
+                                {
+                                        //printf("?   %d , %d, %d",moves[asd],checker,asd);
+                                        ij=0;
+                                }
+                                if(capture_indexes[asd]!=-1)
+                                {
+                                        if(moves[capture_indexes[asd]]==checker)
+                                        {
+                                                //printf("\n%d\n",moves[capture_indexes[asd]]);
+                                                ij=0;
+                                                //printf("\n?  %d , %d, %d",moves[capture_indexes[asd]],checker,asd);
+                                                //printf("Capturing something!\n");
+                                                captured=1;
+                                        }
+                                }
+                        }
+                        if(ij!=0)
+                        {
+                                printf("Not a valid spot, choose again\n");
+                                for(cleaner_var=0;cleaner_var<50;cleaner_var++)
+                                {
+                                        moves[cleaner_var]=-1;
+                                        capture_indexes[cleaner_var]=-1;
+                                }
                                 return 1;
                         }
-                        while(ij!=0)
-                        {
-                                //asd is used to loop thru the moves
-                                int asd;
-                                for(asd=0;asd<=ij;asd++)
-                                {
-                                        movedisp(moves[asd]);
-                                        if(moves[asd]==checker)
-                                        {
-                                                ij=0;
-                                        }
-                                        if(moves[capture_indexes[asd]]!=0)
-                                        {
-                                                if(moves[capture_indexes[asd]]==checker)
-                                                {
-                                                        printf("\n%d\n",moves[capture_indexes[asd]]);
-                                                        ij=0;
-                                                        printf("Capturing something!\n");
-                                                        captured=1;
-                                                }
-                                        }
-                                }
-                                if(ij!=0)
-                                {
-                                        printf("Not a valid spot, choose again\n");
-                                        for(cleaner_var=0;cleaner_var<50;cleaner_var++)
-                                        {
-                                                moves[cleaner_var]=0;
-                                                capture_indexes[cleaner_var]=-1;
-                                        }
-                                        return 1;
-                                }
-                        }
-                        return 0;
                 }
+                return 0;
         }
         return 0;
 }
@@ -1211,7 +1259,77 @@ void rookblack()
                 }
         }
 }
+
 int check_checker(int cond)
 {
-        
+        if(turn==1)
+        {     
+                int imp,i2,j2;
+                for(int i=0;i<8;i++)
+                {
+                        for(int j=0;j<8;j++)
+                        {
+                                if(board[i][j]==6)
+                                {
+                                        imp=(i*10)+j;
+                                        board[i][j]=5;
+                                        i2=i;
+                                        j2=j;
+                                        break;
+                                }
+                        }
+                }
+                choice1=i2;
+                choice2=j2;
+                move_finder(1);
+                if(capture_indexes[0]!=-1)
+                {
+                        board[i2][j2]=6;
+                        return 1;
+                }
+                board[i2][j2]=3;
+                move_finder(1);
+                if(capture_indexes[0]!=-1)
+                {
+                        board[i2][j2]=6;
+                        return 1;
+                }
+                board[i2][j2]=6;
+                return 0;
+        }
+        else
+        {     
+                int imp,i2,j2;
+                for(int i=0;i<8;i++)
+                {
+                        for(int j=0;j<8;j++)
+                        {
+                                if(board[i][j]==-6)
+                                {
+                                        imp=(i*10)+j;
+                                        board[i][j]=-5;
+                                        i2=i;
+                                        j2=j;
+                                        break;
+                                }
+                        }
+                }
+                choice1=i2;
+                choice2=j2;
+                move_finder(1);
+                if(capture_indexes[0]!=-1)
+                {
+                        board[i2][j2]=-6;
+                        return 1;
+                }
+                board[i2][j2]=-3;
+                move_finder(1);
+                if(capture_indexes[0]!=-1)
+                {
+                        board[i2][j2]=-6;
+                        return 1;
+                }
+                board[i2][j2]=-6;
+                return 0;
+        }
 }
