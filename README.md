@@ -1,2 +1,4 @@
 # Chess
-Basic chess in c
+Chess fully coded in C.
+Coded in a way to allow easy integration for adding an AI.
+GUI coded using GTK+
